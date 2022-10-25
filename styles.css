@@ -1,0 +1,15 @@
+/* These CSS rules apply to the <html>, <body>, and <div id="app"> HTML elements in index.html */
+html, body, #app {
+
+  background-color: rgb(73, 92, 55);
+  width: 800px;
+  margin: auto;
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  padding: 10px;
+  text-align: center;
+  border-radius: 0px;
+  color: #c8da71;
+  box-sizing: border-box;
+}
