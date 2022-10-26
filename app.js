@@ -58,61 +58,88 @@ $(document).ready(function () {
   var $info = $('<div id="info">' + defaultInfo(song.key, tempo) + '</div><br>');
   $info.css('height', '50px');
 
+  var $songList = $('<br><div id="songList" style="padding: 10px"></div>');
+
   $head.appendTo(document.body);
   $info.appendTo(document.body);
   $key.appendTo(document.body);
   $tempoIn.appendTo(document.body);
   $tempoButton.appendTo(document.body);
   $button.appendTo(document.body);
+  $songList.appendTo(document.body);
 
   $button.on('click', function() {
     if (playing) {
-      stop();
-
-      $info.html(defaultInfo(song.key, tempo));
-      playing = false;
+      reset();
 
       $button.html('Play!');
     } else {
-      tempo = $tempoIn.val();
-      currentChord = 0;
-      currentSection = 0;
-      song.first = -1;
-      song.rhythms = {verse: '', chorus: '', bridge: ''};
-
-      song.progression.verse = getProgression();
-      song.progression.chorus = getProgression();
-      song.progression.bridge = getProgression();
-      playing = true;
       play();
-
-      console.log(song);
-      $button.html('Stop');
     }
   });
 
-  var play = function() {
+  reset = function() {
+    song = new Song();
+
+    songs.push(song);
+
+    $tempoIn.val(song.tempo);
+
+    var $song = $('<div class="song" id="' + song.name + '" style="height: 10px; padding: 10px"></div>');
+    $song.html(song.name);
+    $song.on('click', function() {
+      console.log(this.id)
+      stop();
+      for (let i = 0; i < songs.length; i++) {
+        if (songs[i].name == this.id) {
+          song = songs[i];
+        }
+      }
+      $key.val(song.key);
+      $tempoIn.val(song.tempo);
+      tempo = song.tempo;
+      play();
+    });
+
+    $song.appendTo($songList);
+
+    stop();
+  }
+
+  play = function() {
+    $button.html('Stop');
+    $info.html('Playing ' + song.structure[currentSection] + ' in ' + song.name + ', in the key of ' + song.key + ' with a tempo of ' + tempo + '.<br><br>' + time.print());
+
     setTimeout(function() {
       time.reset();
+      tempo = song.tempo;
+      tick = 0;
+      playing = true;
 
       var run = setInterval(function() {
         timeCount();
         playSong();
 
-        var section = song.structure[currentSection];
-        $info.html('Playing the ' + section + ' progression (' + song.progression[section] + '), in the key of ' + song.key + ' with a tempo of ' + tempo + '.<br><br>' + time.print());
+        $info.html('Playing ' + song.structure[currentSection] + ' in ' + song.name + ', in the key of ' + song.key + ' with a tempo of ' + tempo + '.<br><br>' + time.print());
 
         tick++;
       }, 60000/tempo/32);
     }, 1000);
   };
 
-  var stop = function() {
+  stop = function() {
+    playing = false;
     var highestIntervalId = setInterval(";");
     for (let i = 0 ; i < highestIntervalId ; i++) {
         clearInterval(i);
     };
 
+    $info.html(defaultInfo(song.key, tempo));
+    time.reset();
     tick = 0;
   };
+
+  for (var i = 0; i < 3; i++) {
+    reset();
+  }
 });

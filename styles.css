@@ -13,3 +13,7 @@ html, body, #app {
   color: #c8da71;
   box-sizing: border-box;
 }
+
+.song:hover {
+  color: rgb(159, 194, 77);
+}

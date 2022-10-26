@@ -5,6 +5,8 @@ var currentChord = 0;
 var currentSection = 0;
 var progLength = 4;
 var playing = false;
+var play, stop;
+var songs = [];
 var rhythm = 'arpeggio2';
 var rhythms = ['whole',
                'rocking',
@@ -80,42 +82,10 @@ var notesInKey = function(key) {
   return notes;
 };
 
-var song = {
-  key: base[Math.floor(Math.random() * base.length)],
-  notes: [],
-  chords: {},
-  first: -1,
-  progression: {verse: '', chorus: '', bridge: ''},
-  structure: ['verse', 'verse', 'chorus', 'verse', 'verse', 'chorus', 'chorus', 'bridge', 'chorus'],
-  rhythms: {verse: '', chorus: '', bridge: ''}
-};
-
-song.notes = notesInKey(song.key);
-
-for (var i = 1; i <= 7; i++) {
-  var base = [0, 2, 4];
-  song.chords['c' + i] = {
-    notes: [i - 1 < 7 ? i - 1 : i - 8,
-            i + 1 < 7 ? i + 1 : i - 6,
-            i + 3 < 7 ? i + 3 : i - 4],
-    play: function() {
-      var notes = this.notes;
-      for (let i = 0; i < notes.length; i++) {
-        var chk = notes[i];
-        var pos = song.notes[chk].audio;
-
-        audio[pos].play();
-      }
-    }
-  }
-}
+var song = new Song();
 
 var playSong = function() {
-  for (var key in song.rhythms) {
-    if (song.rhythms[key] == '') {
-      song.rhythms[key] = rhythms[Math.floor(Math.random() * rhythms.length)];
-    }
-  }
+  tempo = song.tempo;
 
   if (currentSection < song.structure.length) {
     var cur = song.structure[currentSection];
@@ -129,11 +99,13 @@ var playSong = function() {
 
     playSection(cur);
 
-    if (time.measure % 2 == 0 && time.whole == 4 && time.sixteenth == 16 && onSixteenth) {
+    if (time.measure % 1 == 0 && time.whole == 4 && time.sixteenth == 16 && onSixteenth) {
       currentSection++;
     }
   } else {
     currentSection = 0;
+    reset();
+    play();
   }
 
 }
@@ -154,8 +126,6 @@ var playSection = function(section) {
       temp.sort(function(a, b) {
         return a - b;
       });
-
-      //console.log(temp);
 
       switch (rhythm) {
         case 'whole':

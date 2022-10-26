@@ -87,20 +87,9 @@ var getNext = function(chord) {
 }
 
 // Pulls a random root chord from inputs and then completes progression with getNext.
-var getProgression = function() {
+var getProgression = function(first) {
   var progression = '';
-
-  if (song.first == -1) {
-    var start = [];
-
-    for (let i = 0; i < inputs.length; i++) {
-      start.push(inputs[i][0])
-    }
-
-    song.first = start[Math.floor(Math.random()*start.length)]
-  }
-
-  progression += song.first;
+  progression += first;
 
   while (progression.length < progLength) {
     var cur = progression[progression.length - 1];
