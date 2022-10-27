@@ -19,8 +19,9 @@ var inputs = [
 ];
 
 // this first counts the occurrences of a chord after the current chord in the input array...
-var preProb = {c1: [], c2: [], c3: [], c4: [], c5: [], c6: [], c7: []};
-for (let i = 0; i < inputs.length; i++) {
+var nextProb = {c1: [], c2: [], c3: [], c4: [], c5: [], c6: [], c7: []};
+
+for (var i = 0; i < inputs.length; i++) {
   for (var j = 0; j < inputs[i].length; j++) {
     var key = 'c' + inputs[i][j];
     var next;
@@ -31,25 +32,25 @@ for (let i = 0; i < inputs.length; i++) {
       next = inputs[i][j + 1];
     };
 
-    if (preProb[key] == undefined) {
-      preProb[key] = [0];
-      preProb[key][next] = 1;
+    if (nextProb[key] == undefined) {
+      nextProb[key] = [0];
+      nextProb[key][next] = 1;
     } else {
-      if (preProb[key][next] == undefined) {
-        preProb[key][next] = 1;
+      if (nextProb[key][next] == undefined) {
+        nextProb[key][next] = 1;
       } else {
-        preProb[key][next] += 1;
+        nextProb[key][next] += 1;
       }
     }
   }
 }
 
 // ...then converts the count to a probability for each chord ([0] = 0 because the 0 chord doesn't exist.)
-for (var key in preProb) {
-  var array = preProb[key];
+for (var key in nextProb) {
+  var array = nextProb[key];
   var sum = 0;
 
-  for (let i = 0; i < array.length; i++) {
+  for (var i = 0; i < array.length; i++) {
     if (array[i] > 0) {
       sum += array[i];
     } else {
@@ -57,31 +58,27 @@ for (var key in preProb) {
     }
   }
 
-  for (let i = 0; i < array.length; i++) {
+  for (var i = 0; i < array.length; i++) {
     if (array[i] > 0) {
       array[i] = (Math.floor(array[i]/sum*100))/100;
     }
   }
 }
 
-console.log(inputs);
-
-// Pulls probability from preProb to fill an array with instances of the chord number and selects randomly from among them, to add to the progression.
+// Pulls probability from nextProb to fill an array with instances of the chord number and selects randomly from among them, to add to the progression.
 // I've chosen to do it this way because it doesn't give preference to any number.
 // Rather than checking against the chords in a particular order, it pulls once from an existing dataset.
 var getNext = function(chord) {
-  var cur = preProb[chord];
+  var cur = nextProb[chord];
 
   var chk = [];
 
-  for (let i = 0; i < cur.length; i++) {
-    for (let j = 0; j < cur[i]*100; j++) {
+  for (var i = 0; i < cur.length; i++) {
+    for (var j = 0; j < cur[i]*100; j++) {
       chk.push(i);
     }
   }
   var n = Math.floor(Math.random()*chk.length);
-
-  //console.log(cur, chk, chk[n]);
 
   return chk[n];
 }

@@ -72,9 +72,9 @@ var notesInKey = function(key) {
   for (let i = 0; i < 12; i++) {
     if (i == 0 || i == 2 || i == 4 || i == 5 || i == 7 || i == 9 || i == 11) {
       if (rootIndex + i < 12) {
-        notes.push({note: all[rootIndex + i].note, position: rootIndex + i, audio: rootIndex + i})
+        notes.push({note: all[rootIndex + i].note, audio: rootIndex + i})
       } else {
-        notes.push({note: all[rootIndex + i - 12].note, position: rootIndex + i - 12, audio: rootIndex + i - 12});
+        notes.push({note: all[rootIndex + i - 12].note, audio: rootIndex + i - 12});
       }
     }
   }
@@ -185,6 +185,9 @@ var playSection = function(section) {
                 audio[temp[2]].play();
                 break;
               case 2:
+                audio[temp[0]].play();
+                break;
+              case 5:
                 audio[temp[0]].play();
                 break;
               case 4:

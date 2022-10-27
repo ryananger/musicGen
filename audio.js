@@ -1,6 +1,6 @@
 var audio = [];
 
-for (let i = 0; i < all.length; i++) {
+for (var i = 0; i < all.length; i++) {
   var note = document.createElement('audio');
   note.src = 'notes/' + all[i].position + '.mp3';
 

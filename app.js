@@ -2,7 +2,7 @@ $(document).ready(function () {
   var $head = $('<h1>musicGen</h1>');
   var $key = $('<select id="keys"></select>');
 
-  for (let i = 0; i < all.length; i++) {
+  for (var i = 0; i < all.length; i++) {
     var option = $('<option value="' + all[i].note + '">' + all[i].note + '</option>');
     option.appendTo($key);
   };
@@ -86,11 +86,11 @@ $(document).ready(function () {
     $tempoIn.val(song.tempo);
 
     var $song = $('<div class="song" id="' + song.name + '" style="height: 10px; padding: 10px"></div>');
+
     $song.html(song.name);
     $song.on('click', function() {
-      console.log(this.id)
       stop();
-      for (let i = 0; i < songs.length; i++) {
+      for (var i = 0; i < songs.length; i++) {
         if (songs[i].name == this.id) {
           song = songs[i];
         }
@@ -108,6 +108,8 @@ $(document).ready(function () {
 
   play = function() {
     $button.html('Stop');
+
+    console.log(song);
     $info.html('Playing ' + song.structure[currentSection] + ' in ' + song.name + ', in the key of ' + song.key + ' with a tempo of ' + tempo + '.<br><br>' + time.print());
 
     setTimeout(function() {
