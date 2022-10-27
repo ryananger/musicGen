@@ -1,0 +1,36 @@
+var nStr = 'baker.barker.race car driver.rhino.cop.robber.banker.child.king.queen.garbage man.angel.devil.deeds.actor.gold.painting.advertisement.grass.parrot.afternoon.pencil.airport.guitar.piano.ambulance.muskrat.giraffe.bandana.alpaca.bird.fur.yarn.book.cardboard.bike.candle.oil.food.crochet hook.pen.pencil.fork.spoon.knife.mancala.television.modem.package.cloth.claw.clone.spindle'
+var aStr = 'adorable.adventurous.aggressive.agreeable.alert.alive.amused.angry.annoyed.annoying.anxious.arrogant.ashamed.attractive.average.awful.bad.beautiful.better.bewildered.black.bloody.blue.blue-eyed.blushing.bored.brainy.brave.breakable.bright.busy.calm.careful.cautious.charming.cheerful.clean.clear.clever.cloudy.clumsy.colorful.combative.comfortable.concerned.condemned.confused.cooperative.courageous.crazy.creepy.crowded.cruel.curious.cute.dangerous.dark.dead.defeated.defiant.delightful.depressed.determined.different.difficult.disgusted.distinct.disturbed.dizzy.doubtful.drab.dull.eager.easy.elated.elegant.embarrassed.enchanting.encouraging.energetic.enthusiastic.envious.evil.excited.expensive.exuberant.fair.faithful.famous.fancy.fantastic.fierce.filthy.fine.foolish.fragile.frail.frantic.friendly.frightened.funny.gentle.gifted.glamorous.gleaming.glorious.good.gorgeous.graceful.grieving.grotesque.grumpy.handsome.happy.healthy.helpful.helpless.hilarious.homeless.homely.horrible.hungry.hurt.ill.important.impossible.inexpensive.innocent.inquisitive.itchy.jealous.jittery.jolly.joyous.kind.lazy.light.lively.lonely.long.lovely.lucky.magnificent.misty.modern.motionless.muddy.mushy.mysterious.nasty.naughty.nervous.nice.nutty.obedient.obnoxious.odd.old-fashioned.open.outrageous.outstanding.panicky.perfect.plain.pleasant.poised.poor.powerful.precious.prickly.proud.putrid.puzzled.quaint.real.relieved.repulsive.rich.scary.selfish.shiny.shy.silly.sleepy.smiling.smoggy.sore.sparkling.splendid.spotless.stormy.strange.stupid.successful.super .talented .tame .tasty.tender.tense.terrible.thankful.thoughtful.thoughtless.tired.tough.troubled.ugliest.ugly.uninterested.unsightly.unusual.upset.uptight.vast.victorious.vivacious.wandering.weary.wicked.wide-eyed.wild.witty.worried.worrisome.wrong.zany.zealous';
+//var aStr = 'adorable.adventurous.aggressive.agreeable.alert.alive.amused.angry.annoyed.annoying';
+var adjs = [];
+var nouns = [];
+
+//debugger
+while (aStr.length > 0) {
+  var dot = aStr.indexOf('.');
+
+  if (dot == -1) {
+    adjs.push(aStr);
+    aStr = '';
+  } else {
+    adjs.push(aStr.slice(0, dot));
+    aStr = aStr.slice(dot + 1);
+  }
+}
+
+while (nStr.length > 0) {
+  var dot = nStr.indexOf('.');
+
+  if (dot == -1) {
+    nouns.push(nStr);
+    nStr = '';
+  } else {
+    nouns.push(nStr.slice(0, dot));
+    nStr = nStr.slice(dot + 1);
+  }
+}
+
+var generateName = function() {
+  var mod = Math.floor(Math.random()*2) == 0 ? 'the ' : '';
+
+  return mod + adjs[Math.floor(Math.random()*adjs.length)] + ' ' + nouns[Math.floor(Math.random()*nouns.length)];
+};
