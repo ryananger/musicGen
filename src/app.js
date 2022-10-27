@@ -1,5 +1,7 @@
 $(document).ready(function () {
   var $head = $('<h1>musicGen</h1>');
+
+  // key select
   var $key = $('<select id="keys"></select>');
 
   for (var i = 0; i < all.length; i++) {
@@ -19,6 +21,7 @@ $(document).ready(function () {
     }
   });
 
+  // tempo set
   var $tempoButton = $('<button id="tempo">Set Tempo</button>');
   var $tempoIn = $('<input id="tempo" value=""></input>');
   $tempoIn.val(tempo);
@@ -49,24 +52,8 @@ $(document).ready(function () {
     }
   }
 
+  // button
   var $button = $('<button id="button">Play!</button>');
-
-  var defaultInfo = function (key, tempo) {
-    return 'Press PLAY to hear a randomly generated song in the key of ' + key + ', with a tempo of ' + tempo + '.<br><br>';
-  };
-
-  var $info = $('<div id="info">' + defaultInfo(song.key, tempo) + '</div><br>');
-  $info.css('height', '50px');
-
-  var $songList = $('<br><div id="songList" style="padding: 10px"></div>');
-
-  $head.appendTo(document.body);
-  $info.appendTo(document.body);
-  $key.appendTo(document.body);
-  $tempoIn.appendTo(document.body);
-  $tempoButton.appendTo(document.body);
-  $button.appendTo(document.body);
-  $songList.appendTo(document.body);
 
   $button.on('click', function() {
     if (playing) {
@@ -78,13 +65,17 @@ $(document).ready(function () {
     }
   });
 
-  reset = function() {
-    song = new Song();
+  // info
+  var defaultInfo = function (key, tempo) {
+    return 'Press PLAY to hear a randomly generated song in the key of ' + key + ', with a tempo of ' + tempo + '.<br><br>';
+  };
 
-    songs.push(song);
+  var $info = $('<div id="info">' + defaultInfo(song.key, tempo) + '</div><br>');
+  $info.css('height', '50px');
 
-    $tempoIn.val(song.tempo);
+  var $songList = $('<br><div id="songList" style="padding: 10px"></div>');
 
+  songDiv = function() {
     var $song = $('<div class="song" id="' + song.name + '" style="height: 10px; padding: 10px"></div>');
 
     $song.html(song.name);
@@ -102,15 +93,34 @@ $(document).ready(function () {
     });
 
     $song.appendTo($songList);
+  };
 
-    stop();
-  }
+  $head.appendTo(document.body);
+  $info.appendTo(document.body);
+  $key.appendTo(document.body);
+  $tempoIn.appendTo(document.body);
+  $tempoButton.appendTo(document.body);
+  $button.appendTo(document.body);
+  $songList.appendTo(document.body);
 
+  // reset
+  reset = function() {
+    song = new Song();
+
+    songs.push(song);
+
+    $tempoIn.val(song.tempo);
+    $key.val(song.key);
+
+    songDiv();
+  };
+
+  // play
   play = function() {
     $button.html('Stop');
 
     console.log(song);
-    $info.html('Playing ' + song.structure[currentSection] + ' in ' + song.name + ', in the key of ' + song.key + ' with a tempo of ' + tempo + '.<br><br>' + time.print());
+    $info.html('Playing ' + song.name + ', in the key of ' + song.key + ' with a tempo of ' + tempo + '.<br><br>' + time.print());
 
     setTimeout(function() {
       time.reset();
@@ -126,15 +136,17 @@ $(document).ready(function () {
 
         tick++;
       }, 60000/tempo/32);
-    }, 1000);
+    }, 2000);
   };
 
+  // stop
   stop = function() {
-    playing = false;
     var highestIntervalId = setInterval(";");
     for (let i = 0 ; i < highestIntervalId ; i++) {
         clearInterval(i);
     };
+
+    playing = false;
 
     $info.html(defaultInfo(song.key, tempo));
     time.reset();

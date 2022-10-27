@@ -5,7 +5,7 @@ var currentChord = 0;
 var currentSection = 0;
 var progLength = 4;
 var playing = false;
-var play, stop;
+var play, stop, reset;
 var songs = [];
 var rhythm = 'arpeggio2';
 var rhythms = ['whole',
@@ -104,6 +104,7 @@ var playSong = function() {
     }
   } else {
     currentSection = 0;
+    stop();
     reset();
     play();
   }
@@ -127,185 +128,189 @@ var playSection = function(section) {
         return a - b;
       });
 
-      switch (rhythm) {
-        case 'whole':
-          if (onWhole) {
-            song.chords['c' + cur].play();
-
-            currentChord++;
-            if (currentChord >= progLength) {
-              currentChord = 0;
-            }
-          }
-          break;
-        case 'quarter':
-          if (onQuarter) {
-            song.chords['c' + cur].play();
-
-            if (time.quarter == 4) {
-              currentChord++;
-              if (currentChord >= progLength) {
-                currentChord = 0;
-              }
-            }
-          }
-          break;
-        case 'rocking':
-          if (onEighth) {
-            switch (time.eighth) {
-              case 1:
-              case 3:
-              case 5:
-              case 7:
-                audio[temp[1]].play();
-                audio[temp[2]].play();
-                break;
-              case 2:
-              case 4:
-              case 6:
-              case 8:
-                audio[temp[0]].play();
-                break;
-            }
-
-            if (time.eighth == 8) {
-              currentChord++;
-              if (currentChord >= progLength) {
-                currentChord = 0;
-              }
-            }
-          }
-          break;
-        case 'bubble':
-          if (onEighth) {
-            switch (time.eighth) {
-              case 1:
-                audio[temp[0]].play();
-                audio[temp[1]].play();
-                audio[temp[2]].play();
-                break;
-              case 2:
-                audio[temp[0]].play();
-                break;
-              case 5:
-                audio[temp[0]].play();
-                break;
-              case 4:
-              case 7:
-                audio[temp[1]].play();
-                audio[temp[2]].play();
-                break;
-              case 8:
-                audio[temp[1]].play();
-                break;
-            }
-
-            if (time.eighth == 8) {
-              currentChord++;
-              if (currentChord >= progLength) {
-                currentChord = 0;
-              }
-            }
-          }
-          break;
-        case 'tresillo':
-          if (onEighth) {
-            if (time.eighth == 1 || time.eighth == 4 || time.eighth == 7) {
-              song.chords['c' + cur].play();
-
-              if (time.eighth == 7) {
-                currentChord++;
-                if (currentChord >= progLength) {
-                  currentChord = 0;
-                }
-              }
-            }
-          }
-          break;
-        case 'tresillo8ths':
-          if (onEighth) {
-            audio[temp[0]].play();
-
-            switch (time.eighth) {
-              case 1:
-              case 4:
-              case 7:
-                audio[temp[1]].play();
-                audio[temp[2]].play();
-                break;
-            }
-
-            if (time.eighth == 8) {
-              currentChord++;
-              if (currentChord >= progLength) {
-                currentChord = 0;
-              }
-            }
-          }
-          break;
-        case 'arpeggio1':
-          if (onEighth) {
-            switch (time.eighth) {
-              case 1:
-                audio[temp[1]].play();
-                audio[temp[2]].play();
-              case 5:
-                audio[temp[0]].play();
-                break;
-              case 2:
-              case 4:
-              case 6:
-              case 8:
-                audio[temp[1]].play();
-                break;
-              case 3:
-              case 7:
-                audio[temp[2]].play();
-                break;
-            }
-
-            if (time.eighth == 8) {
-              currentChord++;
-              if (currentChord >= progLength) {
-                currentChord = 0;
-              }
-            }
-          }
-          break;
-        case 'arpeggio2':
-          if (onEighth) {
-            switch (time.eighth) {
-              case 1:
-              case 4:
-              case 7:
-                audio[temp[0]].play();
-                audio[temp[2]].play();
-                break;
-              case 2:
-              case 5:
-              case 8:
-                audio[temp[1]].play();
-                break;
-              case 3:
-              case 6:
-                audio[temp[2]].play();
-                break;
-            }
-
-            if (time.eighth == 8) {
-              currentChord++;
-              if (currentChord >= progLength) {
-                currentChord = 0;
-              }
-            }
-          }
-          break;
-      }
+      playRhythm(cur, temp);
     } else {
       playing = true;
     }
   }
   playCurrent();
+}
+
+var playRhythm = function(num, notesInChord) {
+  switch (rhythm) {
+    case 'whole':
+      if (onWhole) {
+        song.chords['c' + num].play();
+
+        currentChord++;
+        if (currentChord >= progLength) {
+          currentChord = 0;
+        }
+      }
+      break;
+    case 'quarter':
+      if (onQuarter) {
+        song.chords['c' + num].play();
+
+        if (time.quarter == 4) {
+          currentChord++;
+          if (currentChord >= progLength) {
+            currentChord = 0;
+          }
+        }
+      }
+      break;
+    case 'rocking':
+      if (onEighth) {
+        switch (time.eighth) {
+          case 1:
+          case 3:
+          case 5:
+          case 7:
+            audio[notesInChord[1]].play();
+            audio[notesInChord[2]].play();
+            break;
+          case 2:
+          case 4:
+          case 6:
+          case 8:
+            audio[notesInChord[0]].play();
+            break;
+        }
+
+        if (time.eighth == 8) {
+          currentChord++;
+          if (currentChord >= progLength) {
+            currentChord = 0;
+          }
+        }
+      }
+      break;
+    case 'bubble':
+      if (onEighth) {
+        switch (time.eighth) {
+          case 1:
+            audio[notesInChord[0]].play();
+            audio[notesInChord[1]].play();
+            audio[notesInChord[2]].play();
+            break;
+          case 2:
+            audio[notesInChord[0]].play();
+            break;
+          case 5:
+            audio[notesInChord[0]].play();
+            break;
+          case 4:
+          case 7:
+            audio[notesInChord[1]].play();
+            audio[notesInChord[2]].play();
+            break;
+          case 8:
+            audio[notesInChord[1]].play();
+            break;
+        }
+
+        if (time.eighth == 8) {
+          currentChord++;
+          if (currentChord >= progLength) {
+            currentChord = 0;
+          }
+        }
+      }
+      break;
+    case 'tresillo':
+      if (onEighth) {
+        if (time.eighth == 1 || time.eighth == 4 || time.eighth == 7) {
+          song.chords['c' + num].play();
+
+          if (time.eighth == 7) {
+            currentChord++;
+            if (currentChord >= progLength) {
+              currentChord = 0;
+            }
+          }
+        }
+      }
+      break;
+    case 'tresillo8ths':
+      if (onEighth) {
+        audio[notesInChord[0]].play();
+
+        switch (time.eighth) {
+          case 1:
+          case 4:
+          case 7:
+            audio[notesInChord[1]].play();
+            audio[notesInChord[2]].play();
+            break;
+        }
+
+        if (time.eighth == 8) {
+          currentChord++;
+          if (currentChord >= progLength) {
+            currentChord = 0;
+          }
+        }
+      }
+      break;
+    case 'arpeggio1':
+      if (onEighth) {
+        switch (time.eighth) {
+          case 1:
+            audio[notesInChord[1]].play();
+            audio[notesInChord[2]].play();
+          case 5:
+            audio[notesInChord[0]].play();
+            break;
+          case 2:
+          case 4:
+          case 6:
+          case 8:
+            audio[notesInChord[1]].play();
+            break;
+          case 3:
+          case 7:
+            audio[notesInChord[2]].play();
+            break;
+        }
+
+        if (time.eighth == 8) {
+          currentChord++;
+          if (currentChord >= progLength) {
+            currentChord = 0;
+          }
+        }
+      }
+      break;
+    case 'arpeggio2':
+      if (onEighth) {
+        switch (time.eighth) {
+          case 1:
+          case 4:
+          case 7:
+            audio[notesInChord[0]].play();
+            audio[notesInChord[2]].play();
+            break;
+          case 2:
+          case 5:
+          case 8:
+            audio[notesInChord[1]].play();
+            break;
+          case 3:
+          case 6:
+            audio[notesInChord[2]].play();
+            break;
+        }
+
+        if (time.eighth == 8) {
+          currentChord++;
+          if (currentChord >= progLength) {
+            currentChord = 0;
+          }
+        }
+      }
+      break;
+  }
 }
 
 var playScale = function() {
