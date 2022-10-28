@@ -15,8 +15,26 @@ var inputs = [
   '4565',
   '4564',
   '6141',
-  '4511'
+  '4511',
+  '4515',
+  '2125',
+  '1645',
+  '4655',
+  '6215',
+  '6415',
+  '1564',
+  '6543',
+
+  // my inputs
+  '2234',
+  '3424',
+  '1352',
+  '1532'
 ];
+
+inputs.sort(function(a, b) {
+  return a - b;
+});
 
 // this first counts the occurrences of a chord after the current chord in the input array...
 var nextProb = {c1: [], c2: [], c3: [], c4: [], c5: [], c6: [], c7: []};
@@ -70,7 +88,6 @@ for (var key in nextProb) {
 // Rather than checking against the chords in a particular order, it pulls once from an existing dataset.
 var getNext = function(chord) {
   var cur = nextProb[chord];
-
   var chk = [];
 
   for (var i = 0; i < cur.length; i++) {

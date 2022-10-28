@@ -52,7 +52,7 @@ var onWhole, onQuarter, onEighth, onSixteenth;
 var allNotes = function() {
   all = [];
 
-  for (let i = 0; i < base.length; i++) {
+  for (var i = 0; i < base.length; i++) {
     all.push({note: base[i], position: all.length});
     if (i !== 2 && i !== 6) {
       all.push({note: base[i] + '#', position: all.length});
@@ -64,14 +64,14 @@ var allNotes = function() {
 var notesInKey = function(key) {
   var notes = [];
   var rootIndex = function() {
-    for (let i = 0; i < all.length; i++) {
+    for (var i = 0; i < all.length; i++) {
       if (all[i].note === key) {
         return i;
       }
     }
   }();
 
-  for (let i = 0; i < 12; i++) {
+  for (var i = 0; i < 12; i++) {
     if (i == 0 || i == 2 || i == 4 || i == 5 || i == 7 || i == 9 || i == 11) {
       if (rootIndex + i < 12) {
         notes.push({note: all[rootIndex + i].note, audio: rootIndex + i})
@@ -101,7 +101,7 @@ var playSong = function() {
 
     playSection(cur);
 
-    if (time.measure % 1 == 0 && time.whole == 4 && time.sixteenth == 16 && onSixteenth) {
+    if (time.measure % 2 == 0 && time.whole == 4 && time.sixteenth == 16 && onSixteenth) {
       currentSection++;
     }
   } else {
@@ -135,6 +135,7 @@ var playSection = function(section) {
       playing = true;
     }
   }
+
   playCurrent();
 }
 

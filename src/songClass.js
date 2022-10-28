@@ -7,13 +7,13 @@ class Song {
     this.chords = {};
     this.first = -1;
     this.progression = {verse: '', chorus: '', bridge: ''};
-    this.structure = ['verse', 'verse', 'chorus', 'verse', 'verse', 'chorus', 'chorus', 'bridge', 'chorus'];
+    this.structure = ['verse', 'verse', 'chorus', 'verse', 'chorus', 'chorus', 'bridge', 'chorus'];
     this.rhythms = {verse: '', chorus: '', bridge: ''};
     this.tempo = Math.floor(Math.random() * 120) + 60;
     this.getFirst = function() {
       var start = [];
 
-      for (let i = 0; i < inputs.length; i++) {
+      for (var i = 0; i < inputs.length; i++) {
         start.push(inputs[i][0]);
       }
 
@@ -38,7 +38,7 @@ class Song {
                 i + 3 < 7 ? i + 3 : i - 4],
         play: function() {
           var notes = this.notes;
-          for (let i = 0; i < notes.length; i++) {
+          for (var i = 0; i < notes.length; i++) {
             var chk = notes[i];
             var pos = song.notes[chk].audio;
 
