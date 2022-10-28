@@ -7,6 +7,8 @@ var progLength = 4;
 var playing = false;
 var play, stop, reset;
 var songs = [];
+var toggleSongDiv;
+var setSongDiv;
 var rhythm = 'arpeggio2';
 var rhythms = ['whole',
                'rocking',

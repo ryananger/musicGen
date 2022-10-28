@@ -29,9 +29,26 @@ while (nStr.length > 0) {
   }
 }
 
+var songNames = [];
+var dups = [];
+
 var generateName = function() {
-  var mods = ['', '', '', '', 'the ', 'the long ', 'old ', 'new ']
+  var mods = ['', 'the ', 'ye ', 'old ', 'new ', 'endless ', 'longest ']
+
   var mod = mods[Math.floor(Math.random()*mods.length)];
 
-  return mod + adjs[Math.floor(Math.random()*adjs.length)] + ' ' + nouns[Math.floor(Math.random()*nouns.length)];
+  if (Math.random() > 0.7 && (mod == 'the ' || mod == 'ye ')) {
+    mod += mods[1 + Math.floor(Math.random() * 4)];
+  }
+
+  var name = mod + adjs[Math.floor(Math.random()*adjs.length)] + ' ' + nouns[Math.floor(Math.random()*nouns.length)]
+
+  if (songNames.indexOf(name) == -1) {
+    songNames.push(name);
+  } else {
+    dups.push(name);
+    return generateName();
+  }
+
+  return name;
 };

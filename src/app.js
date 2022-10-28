@@ -57,6 +57,7 @@ $(document).ready(function () {
 
   $button.on('click', function() {
     if (playing) {
+      stop();
       reset();
 
       $button.html('Play!');
@@ -73,9 +74,30 @@ $(document).ready(function () {
   var $info = $('<div id="info">' + defaultInfo(song.key, tempo) + '</div><br>');
   $info.css('height', '50px');
 
-  var $songList = $('<br><div id="songList" style="padding: 10px"></div>');
+  var updateInfo = function() {
+    $info.html('Playing ' + song.structure[currentSection] + ' in ' + song.name + ', in the key of ' + song.key + ' with a tempo of ' + tempo + '.<br><br>' + time.print());
+  }
 
-  songDiv = function() {
+  var $currentSong = $('<div id="currentSong" style="height: 100px; display: block"></div>');
+
+  setSongDiv = function(song) {
+    $currentSong.html('<br><h2 style="margin: 0px">' + song.name +
+                      '</h2><p style="margin: 4px">Key: ' + song.key + '\xa0 \xa0' + 'Tempo: ' + song.tempo +
+                      '\xa0 \xa0 Verse: ' + song.progression.verse + '\xa0 \xa0 Chorus: ' + song.progression.chorus + '\xa0 \xa0 Bridge: ' + song.progression.bridge)
+  };
+
+  toggleSongDiv = function() {
+    if (playing === false) {
+      $currentSong.html('');
+    } else if (playing === true) {
+      setSongDiv(song);
+    }
+  };
+
+  // songList
+  var $songList = $('<br><div id="songList" style="padding: 10px; max-height: 400px"></div>');
+
+  var songDiv = function() {
     var $song = $('<div class="song" id="' + song.name + '" style="height: 10px; padding: 10px"></div>');
 
     $song.html(song.name);
@@ -86,9 +108,7 @@ $(document).ready(function () {
           song = songs[i];
         }
       }
-      $key.val(song.key);
-      $tempoIn.val(song.tempo);
-      tempo = song.tempo;
+      reset(song);
       play();
     });
 
@@ -97,6 +117,7 @@ $(document).ready(function () {
 
   $head.appendTo(document.body);
   $info.appendTo(document.body);
+  $currentSong.appendTo(document.body);
   $key.appendTo(document.body);
   $tempoIn.appendTo(document.body);
   $tempoButton.appendTo(document.body);
@@ -104,39 +125,43 @@ $(document).ready(function () {
   $songList.appendTo(document.body);
 
   // reset
-  reset = function() {
-    song = new Song();
+  reset = function(input) {
+    song = input || new Song();
 
-    songs.push(song);
+    if (!input) {
+      songs.push(song);
+      songDiv();
+    }
 
+    currentChord = 0;
+    currentSection = 0;
     $tempoIn.val(song.tempo);
+    tempo = song.tempo;
     $key.val(song.key);
-
-    songDiv();
   };
 
   // play
   play = function() {
-    $button.html('Stop');
-
-    console.log(song);
-    $info.html('Playing ' + song.name + ', in the key of ' + song.key + ' with a tempo of ' + tempo + '.<br><br>' + time.print());
-
     setTimeout(function() {
       time.reset();
       tempo = song.tempo;
       tick = 0;
       playing = true;
+      toggleSongDiv();
 
       var run = setInterval(function() {
         timeCount();
         playSong();
-
-        $info.html('Playing ' + song.structure[currentSection] + ' in ' + song.name + ', in the key of ' + song.key + ' with a tempo of ' + tempo + '.<br><br>' + time.print());
+        updateInfo();
 
         tick++;
       }, 60000/tempo/32);
     }, 2000);
+
+    $button.html('Stop');
+    $info.html('Playing ' + song.name + '.<br><br>' + time.print());
+
+    console.log(song);
   };
 
   // stop
@@ -149,11 +174,12 @@ $(document).ready(function () {
     playing = false;
 
     $info.html(defaultInfo(song.key, tempo));
+    toggleSongDiv();
     time.reset();
     tick = 0;
   };
 
-  for (var i = 0; i < 3; i++) {
+  for (var i = 0; i < 10; i++) {
     reset();
   }
 });
