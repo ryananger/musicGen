@@ -10,14 +10,49 @@ var songs = [];
 var toggleSongDiv;
 var setSongDiv;
 var rhythm = 'arpeggio2';
-var rhythms = ['whole',
+var rhythms = [
+               'whole',
                'rocking',
                'arpeggio1',
                'quarter',
                'bubble',
                'tresillo',
                'tresillo8ths',
-               'arpeggio2'];
+               'arpeggio2'
+              ];
+
+// var stereo = new Tone.StereoWidener(1);
+// stereo.toDestination();
+
+var piano = SampleLibrary.load({
+  instruments: "piano"
+});
+
+piano.toDestination();
+piano.volume.value = -12;
+
+var cello = SampleLibrary.load({
+  instruments: "cello"
+});
+
+cello.toDestination();
+cello.volume.value = -16;
+
+var celloOn = false;
+
+var velocityOn = true;
+var velocity = function(min) {
+  if (!velocityOn) {
+    return 1;
+  }
+
+  var min = min || 0.5;
+  var val = min + (Math.random() * (1 - min));
+
+  return val;
+}
+
+var buffers = [];
 
 var time = {
   measure: 1,
@@ -53,11 +88,40 @@ var allNotes = function() {
   all = [];
 
   for (var i = 0; i < base.length; i++) {
-    all.push({note: base[i], position: all.length});
-    if (i !== 2 && i !== 6) {
-      all.push({note: base[i] + '#', position: all.length});
+    var note = base[i];
+
+    if (i !== 0 && i !== 3) {
+      all.push({note: base[i] + 'b', position: all.length});
     }
+
+    all.push({note: note, position: all.length});
   }
+
+  all.forEach(function(entry) {
+      var i = 1;
+      var note = entry.note;
+
+      var bufferPush = function(i) {
+        if (i === 1 || i === 4) {
+          buffers.push(new Tone.Buffer('./samples/piano/' + note + i + '.mp3', function(res) {
+            console.log('bufferLoad >> piano ' + note, i);
+          }))
+        }
+
+        if (i === 3) {
+          buffers.push(new Tone.Buffer('./samples/cello/' + note + '1.mp3', function(res) {
+            console.log('bufferLoad >> cello ' + note, 1);
+          }))
+        }
+
+        if (i < 7) {
+          bufferPush(i + 1);
+        }
+      }
+
+      bufferPush(i);
+    }
+  )
 }();
 
 // returns notes in a given key (will later add color note functionality)
@@ -74,9 +138,9 @@ var notesInKey = function(key) {
   for (var i = 0; i < 12; i++) {
     if (i == 0 || i == 2 || i == 4 || i == 5 || i == 7 || i == 9 || i == 11) {
       if (rootIndex + i < 12) {
-        notes.push({note: all[rootIndex + i].note, audio: rootIndex + i})
+        notes.push({note: all[rootIndex + i].note, position: rootIndex + i})
       } else {
-        notes.push({note: all[rootIndex + i - 12].note, audio: rootIndex + i - 12});
+        notes.push({note: all[rootIndex + i - 12].note, position: rootIndex + i - 12});
       }
     }
   }
@@ -88,6 +152,7 @@ var song = new Song();
 
 var playSong = function() {
   tempo = song.tempo;
+  Tone.Transport.bpm.value = tempo;
 
   if (currentSection < song.structure.length) {
     var cur = song.structure[currentSection];
@@ -123,7 +188,7 @@ var playSection = function(section) {
       var temp = [];
 
       notesInCurrent.forEach(function(element) {
-        temp.push(song.notes[element].audio);
+        temp.push(song.notes[element].position);
       });
 
       temp.sort(function(a, b) {
@@ -139,7 +204,30 @@ var playSection = function(section) {
   playCurrent();
 }
 
+var octaveBass = function(note) {
+  piano.triggerAttackRelease(note + '1', '1n');
+  //piano.triggerAttackRelease(note + '3', '1n');
+};
+
 var playRhythm = function(num, notesInChord) {
+  var notes = notesInChord.map(function(note) {
+    return all[note].note;
+  });
+
+  var root = song.notes[num - 1].note;
+
+  if (onWhole) {
+    console.log(root, num, notes)
+
+    if (rhythm !== 'whole') {
+      octaveBass(root);
+    }
+
+    if (celloOn) {
+      cello.triggerAttackRelease(root + '1', '1n');
+    }
+  }
+
   switch (rhythm) {
     case 'whole':
       if (onWhole) {
@@ -170,14 +258,14 @@ var playRhythm = function(num, notesInChord) {
           case 3:
           case 5:
           case 7:
-            audio[notesInChord[1]].play();
-            audio[notesInChord[2]].play();
+            piano.triggerAttackRelease(notes[1] + '4', '2n', '+' + (Math.random() * 0.01), velocity());
+            piano.triggerAttackRelease(notes[2] + '4', '2n', '+' + (Math.random() * 0.01), velocity());
             break;
           case 2:
           case 4:
           case 6:
           case 8:
-            audio[notesInChord[0]].play();
+            piano.triggerAttackRelease(notes[0] + '4', '2n', '+' + (Math.random() * 0.01), velocity());
             break;
         }
 
@@ -193,23 +281,23 @@ var playRhythm = function(num, notesInChord) {
       if (onEighth) {
         switch (time.eighth) {
           case 1:
-            audio[notesInChord[0]].play();
-            audio[notesInChord[1]].play();
-            audio[notesInChord[2]].play();
+            piano.triggerAttackRelease(notes[0] + '4', '1n', '+' + (Math.random() * 0.02), velocity());
+            piano.triggerAttackRelease(notes[1] + '4', '1n', '+' + (Math.random() * 0.02), velocity());
+            piano.triggerAttackRelease(notes[2] + '4', '1n', '+' + (Math.random() * 0.02), velocity());
             break;
           case 2:
-            audio[notesInChord[0]].play();
+            piano.triggerAttackRelease(notes[0] + '4', '2n', '+' + (Math.random() * 0.02), velocity());
             break;
           case 5:
-            audio[notesInChord[0]].play();
+            piano.triggerAttackRelease(notes[0] + '4', '2n', '+' + (Math.random() * 0.02), velocity());
             break;
           case 4:
           case 7:
-            audio[notesInChord[1]].play();
-            audio[notesInChord[2]].play();
+            piano.triggerAttackRelease(notes[1] + '4', '2n', '+' + (Math.random() * 0.02), velocity());
+            piano.triggerAttackRelease(notes[2] + '4', '2n', '+' + (Math.random() * 0.02), velocity());
             break;
           case 8:
-            audio[notesInChord[1]].play();
+            piano.triggerAttackRelease(notes[1] + '4', '2n', '+' + (Math.random() * 0.02), velocity());
             break;
         }
 
@@ -237,14 +325,14 @@ var playRhythm = function(num, notesInChord) {
       break;
     case 'tresillo8ths':
       if (onEighth) {
-        audio[notesInChord[0]].play();
+        piano.triggerAttackRelease(notes[0] + '4', '4n', '+' + (Math.random() * 0.01), velocity(0.3));
 
         switch (time.eighth) {
           case 1:
           case 4:
           case 7:
-            audio[notesInChord[1]].play();
-            audio[notesInChord[2]].play();
+            piano.triggerAttackRelease(notes[1] + '4', '1n', '+' + (Math.random() * 0.02), velocity(0.8));
+            piano.triggerAttackRelease(notes[2] + '4', '1n', '+' + (Math.random() * 0.02), velocity(0.8));
             break;
         }
 
@@ -260,20 +348,20 @@ var playRhythm = function(num, notesInChord) {
       if (onEighth) {
         switch (time.eighth) {
           case 1:
-            audio[notesInChord[1]].play();
-            audio[notesInChord[2]].play();
+            piano.triggerAttackRelease(notes[1] + '4', '1n', '+' + (Math.random() * 0.01), velocity(0.2));
+            piano.triggerAttackRelease(notes[2] + '4', '1n', '+' + (Math.random() * 0.01), velocity(0.2));
           case 5:
-            audio[notesInChord[0]].play();
+            piano.triggerAttackRelease(notes[0] + '4', '1n', '+' + (Math.random() * 0.01), velocity(0.2));
             break;
           case 2:
           case 4:
           case 6:
           case 8:
-            audio[notesInChord[1]].play();
+            piano.triggerAttackRelease(notes[1] + '4', '1n', '+' + (Math.random() * 0.01), velocity(0.2));
             break;
           case 3:
           case 7:
-            audio[notesInChord[2]].play();
+            piano.triggerAttackRelease(notes[2] + '4', '1n', '+' + (Math.random() * 0.01), velocity(0.2));
             break;
         }
 
@@ -291,17 +379,17 @@ var playRhythm = function(num, notesInChord) {
           case 1:
           case 4:
           case 7:
-            audio[notesInChord[0]].play();
-            audio[notesInChord[2]].play();
+            piano.triggerAttackRelease(notes[0] + '4', '1n', '+' + (Math.random() * 0.02), velocity(0.2));
+            piano.triggerAttackRelease(notes[2] + '4', '1n', '+' + (Math.random() * 0.02), velocity(0.2));
             break;
           case 2:
           case 5:
           case 8:
-            audio[notesInChord[1]].play();
+            piano.triggerAttackRelease(notes[1] + '4', '1n', '+' + (Math.random() * 0.02), velocity(0.2));
             break;
           case 3:
           case 6:
-            audio[notesInChord[2]].play();
+            piano.triggerAttackRelease(notes[2] + '4', '1n', '+' + (Math.random() * 0.02), velocity(0.2));
             break;
         }
 
@@ -314,45 +402,6 @@ var playRhythm = function(num, notesInChord) {
       }
       break;
   }
-}
-
-var playScale = function() {
-  if (playing) {
-    playing = false;
-  }
-
-  setTimeout(function() {
-    audio[song.notes[0].audio].play();
-  }, 0)
-
-  setTimeout(function() {
-    audio[song.notes[1].audio].play();
-  }, 250)
-
-  setTimeout(function() {
-    audio[song.notes[2].audio].play();
-  }, 500)
-
-  setTimeout(function() {
-    audio[song.notes[3].audio].play();
-  }, 750)
-
-  setTimeout(function() {
-    audio[song.notes[4].audio].play();
-  }, 1000)
-
-  setTimeout(function() {
-    audio[song.notes[5].audio].play();
-  }, 1250)
-
-  setTimeout(function() {
-    audio[song.notes[6].audio].play();
-  }, 1500)
-
-  setTimeout(function() {
-    audio[song.notes[0].audio].play();
-  }, 1750)
-
 }
 
 var timeCount = function() {

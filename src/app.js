@@ -1,5 +1,6 @@
 $(document).ready(function () {
   var $head = $('<h1>musicGen</h1>');
+  var $input = $('<div id="input"></div>');
 
   // key select
   var $key = $('<select id="keys"></select>');
@@ -39,7 +40,7 @@ $(document).ready(function () {
     var chk = $tempoIn.val();
 
     if (chk >= 40 && chk <= 240) {
-      tempo = $tempoIn.val();
+      song.tempo = $tempoIn.val();
       if (playing) {
         stop();
         play();
@@ -66,19 +67,29 @@ $(document).ready(function () {
     }
   });
 
+  var $cello = $('<button id="button">Cello?</button>');
+
+  $cello.on('click', function() {
+    if (celloOn) {
+      celloOn = false;
+    } else {
+      celloOn = true;
+    }
+  });
+
   // info
   var defaultInfo = function (key, tempo) {
     return 'Press PLAY to hear a randomly generated song in the key of ' + key + ', with a tempo of ' + tempo + '.<br><br>';
   };
 
-  var $info = $('<div id="info">' + defaultInfo(song.key, tempo) + '</div><br>');
+  var $info = $('<div id="info">' + defaultInfo(song.key, tempo) + '</div>');
   $info.css('height', '50px');
 
   var updateInfo = function() {
     $info.html('Playing ' + song.structure[currentSection] + ' in ' + song.name + ', in the key of ' + song.key + ' with a tempo of ' + tempo + '.<br><br>' + time.print());
   }
 
-  var $currentSong = $('<div id="currentSong" style="height: 100px; display: block"></div>');
+  var $currentSong = $('<div id="currentSong"></div>');
 
   setSongDiv = function(song) {
     $currentSong.html('<br><h2 style="margin: 0px">' + song.name +
@@ -95,12 +106,13 @@ $(document).ready(function () {
   };
 
   // songList
-  var $songList = $('<br><div id="songList" style="padding: 10px; max-height: 400px"></div>');
+  var $songList = $('<div id="songList" style="padding: 10px"></div>');
 
   var songDiv = function() {
-    var $song = $('<div class="song" id="' + song.name + '" style="height: 10px; padding: 10px"></div>');
+    var $song = $('<div class="song" id="' + song.name + '"></div>');
 
-    $song.html(song.name);
+    $song.html('<h3>' + song.name + '</h3><p style="margin: 10px;">Key: ' + song.key + '\xa0 \xa0' + 'Tempo: ' + song.tempo +
+    '\xa0 \xa0 Verse: ' + song.progression.verse + '\xa0 \xa0 Chorus: ' + song.progression.chorus + '\xa0 \xa0 Bridge: ' + song.progression.bridge + '</p>');
     $song.on('click', function() {
       stop();
       for (var i = 0; i < songs.length; i++) {
@@ -118,10 +130,14 @@ $(document).ready(function () {
   $head.appendTo(document.body);
   $info.appendTo(document.body);
   $currentSong.appendTo(document.body);
-  $key.appendTo(document.body);
-  $tempoIn.appendTo(document.body);
-  $tempoButton.appendTo(document.body);
-  $button.appendTo(document.body);
+
+  $key.appendTo($input);
+  $tempoIn.appendTo($input);
+  $tempoButton.appendTo($input);
+  $button.appendTo($input);
+  $cello.appendTo($input);
+
+  $input.appendTo(document.body);
   $songList.appendTo(document.body);
 
   // reset
@@ -179,7 +195,7 @@ $(document).ready(function () {
     tick = 0;
   };
 
-  for (var i = 0; i < 10; i++) {
+  for (var i = 0; i < 5; i++) {
     reset();
   }
 });

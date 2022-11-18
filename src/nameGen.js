@@ -38,7 +38,7 @@ var generateName = function() {
   var mod = mods[Math.floor(Math.random()*mods.length)];
 
   if (Math.random() > 0.7 && (mod == 'the ' || mod == 'ye ')) {
-    mod += mods[1 + Math.floor(Math.random() * 4)];
+    mod += mods[2 + Math.floor(Math.random() * 4)];
   }
 
   var name = mod + adjs[Math.floor(Math.random()*adjs.length)] + ' ' + nouns[Math.floor(Math.random()*nouns.length)]

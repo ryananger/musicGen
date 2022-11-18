@@ -17,3 +17,31 @@ html, body, #app {
 .song:hover {
   color: rgb(159, 194, 77);
 }
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+#currentSong {
+  display: block;
+  height: 100px;
+}
+
+h3 {
+  font-size: 16px;
+  padding: 5px;
+  margin: 0px;
+}
+
+.song {
+  display: flex;
+  flex-direction: column;
+  flex: auto;
+
+  min-height: 50px;
+}
+
+#input {
+  margin-bottom: 20px;
+}
